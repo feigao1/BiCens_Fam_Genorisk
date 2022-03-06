@@ -216,19 +216,59 @@ inputtores <-function(input){
 
 # Define server
 server <- function(input, output) {
-	dataInput <- eventReactive(input$go, {inputtores(input)})
+	showPlot <- reactiveVal(TRUE)
+	dataInput <- eventReactive(input$go, {showPlot(FALSE); inputtores(input); })
 	output$plotgraph <- renderPlot({
-		t = dataInput()$t; pred = dataInput()$pred
-		pred = pred[t<=90]; t = t[t<=90]
-		par(family = 'sans')
-		plot(t,pred,type = 'l', lwd=1.5, cex.main=1.5, cex.lab=1.5,ylim=c(0,1),xlab = 'Age',ylab = '‘Cumulative incidence of Alzheimer’s disease',main = 'Prediction of Future Disease Risk')
+		if (showPlot()){
+			ref_info = list(APOEe4='0',sex='male',race='white',educ = 12, age=50,CVD='no',relinfo='no')
+			ref_res = inputtores(ref_info)
+			pred_ref = ref_res$pred; t_ref = ref_res$t
+			pred_ref = pred_ref[t_ref<=90]; t_ref = t_ref[t_ref<=90]
+		
+			plot(t_ref, pred_ref,type = 'l', lwd=1.5, col=4, cex.main=1.5, cex.lab=1,ylim=c(0,1),xlab = 'Age',ylab = '‘Cumulative incidence of Alzheimer’s disease',main = 'Prediction of Future Alzheimer\'s Disease Risk')
+			lines(t_ref,rep(0.2,length(t_ref)),lty=2)
+			lines(t_ref,rep(0.4,length(t_ref)),lty=2)
+			lines(t_ref,rep(0.6,length(t_ref)),lty=2)
+			lines(t_ref,rep(0.8,length(t_ref)),lty=2)
+			legend('topright',c('reference'),lty=c(1),col=c(4))
+		} else {
+			t = dataInput()$t; pred = dataInput()$pred
+			pred = pred[t<=90]; t = t[t<=90]
+			par(family = 'sans')
+		
+			ref_info = list(APOEe4='0',sex='male',race='white',educ = 12, age=50,CVD='no',relinfo='no')
+			ref_res = inputtores(ref_info)
+			pred_ref = ref_res$pred; t_ref = ref_res$t
+			pred_ref = pred_ref[t_ref<=90]; t_ref = t_ref[t_ref<=90]
+		
+			plot(t,pred,type = 'l', lwd=1.5, cex.main=1.5, cex.lab=1,ylim=c(0,1),xlab = 'Age',ylab = '‘Cumulative incidence of Alzheimer’s disease',main = 'Prediction of Future Alzheimer\'s Disease Risk')
+			lines(t_ref, pred_ref,lwd=1.5,lty=1,col=4)
+			lines(t,rep(0.2,length(t)),lty=2)
+			lines(t,rep(0.4,length(t)),lty=2)
+			lines(t,rep(0.6,length(t)),lty=2)
+			lines(t,rep(0.8,length(t)),lty=2)
+			legend('topright',c('predicted','reference'),lty=c(1,1),col=c(1,4))
+		}
 	})
 	
 	output$plottable <- renderTable({
-		t_choice = 5*(11 + seq(7)) ### 60 - 90
-		Age = round(dataInput()$t[dataInput()$t %in% t_choice])
-		Cumulative.Incidence = dataInput()$pred[dataInput()$t %in% t_choice]
-		table_data = data.frame(Age,Cumulative.Incidence)
-		table_data
+		# if (showPlot()){
+			# t_choice = 5*(11 + seq(7)) ### 60 - 90
+			# ref_info = list(APOEe4='0',sex='male',race='white',educ = 12, age=50,CVD='no',relinfo='no')
+			# ref_res = inputtores(ref_info)
+			# Age = round(ref_res$t[ref_res$t %in% t_choice])
+			# Cum.Inc.ref = ref_res$pred[ref_res$t %in% t_choice]
+			# table_data = data.frame(Age, Cum.Inc.ref)
+			# table_data
+		# } else{
+			t_choice = 5*(11 + seq(7)) ### 60 - 90
+			Age = round(dataInput()$t[dataInput()$t %in% t_choice])
+			Cum.Inc = dataInput()$pred[dataInput()$t %in% t_choice]
+			ref_info = list(APOEe4='0',sex='male',race='white',educ = 12, age=50,CVD='no',relinfo='no')
+			ref_res = inputtores(ref_info)
+			Cum.Inc.ref = ref_res$pred[ref_res$t %in% Age]
+			table_data = data.frame(Age, Cum.Inc, Cum.Inc.ref)
+			table_data
+		# }
 	})
 }

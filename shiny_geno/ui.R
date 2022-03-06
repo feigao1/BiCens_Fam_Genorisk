@@ -7,11 +7,11 @@ ui <- fluidPage(
 		# Sidebar panel for inputs ----
 		sidebarPanel(
 			# Input ----
-  			selectInput('sex', 'Gender', c("female", "male")),
-  			selectInput('race', 'Race', c("black", "white", "other")),
+  			selectInput('sex', 'Gender', c("male","female")),
+  			selectInput('race', 'Race', c("white", "black", "other")),
   			sliderInput('age', 'Current age',  min = 0, max = 90, value = 50),
   			selectInput("APOEe4", "APOE epsilon4 allelle frequency",  c(0,1,2)),
-  			sliderInput("educ", "Years of education",  min = 0, max = 25, value = 10),
+  			sliderInput("educ", "Years of education",  min = 0, max = 25, value = 12),
   			selectInput('CVD', 'Have you developed any cardiovascular disease?', c("unknown","yes", "no")),
   			conditionalPanel(condition = "input.CVD == 'yes'", selectInput("CVD_ind", "Do you know the age of your first cardivascular disease onset?", c("","yes","no"))),
   			conditionalPanel(condition = "input.CVD_ind == 'yes'", sliderInput("CVD_date", "Your age of first cardivascular disease onset", min = 0, max = 90, value = 50)),
@@ -54,11 +54,14 @@ ui <- fluidPage(
   			actionButton("go", h4("Predict"))
   		),
   		# Main panel for displaying outputs ----
-  		mainPanel(h3("Prediction of Future Disease Risk"),
+  		mainPanel(
+ 			h4("Prediction of risk of Alzheimer's Disease given patient’s characteristics including genetic risk factors and medical history of CVD and his/her family members\' disease history."),
+  			h5("Gao, F., Zeng, D., & Wang, Y. (2021). Semiparametric regression analysis of bivariate censored events in a family study of Alzheimer’s disease. Biostatistics.kxab014"),
   			fluidRow(
-  				column(12, plotOutput('plotgraph', height = 600, width = 600)),
-  				column(11,offset = .5, tableOutput('plottable'))
-  			)
+  				column(7, plotOutput('plotgraph')),#, height = 600, width = 600)),
+  				column(5,offset = .5, tableOutput('plottable'))
+  			),
+  			h5("Reference is a 50-year-old white man with 12 years of education, no APOE epsilon4 allelle, no cardiovascular dissease history, and unknown family history of Alzheimer\'s disease or cardiovascular disease. Cum.Inc and Cum.Inc.ref and predicted cumulative incidence of the individual and the reference.")
   		)
   	)
 )
